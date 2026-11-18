@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Card</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .product-card {
+      width: 100%;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 240px;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .product-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .product-info {
+      padding: 18px;
+    }
+
+    .product-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #222;
+      line-height: 1.4;
+      min-height: 48px;
+      margin-bottom: 12px;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .stars {
+      color: #f5a623;
+      letter-spacing: 1px;
+    }
+
+    .rating-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .review-count {
+      color: #888;
+    }
+
+    .product-price {
+      font-size: 23px;
+      font-weight: 700;
+      color: #c0392b;
+    }
+
+    .product-footer {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-id {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .view-button {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+
+    .view-button:hover {
+      background: #c0392b;
+    }
+
+    /* Main container */
+    .page-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .page-header h1 {
+      font-size: 30px;
+      color: #222;
+      margin-bottom: 12px;
+    }
+
+    #status {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 18px;
+    }
+
+    /* Load button */
+    #loadButton {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #loadButton:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+
+    /* Product Grid */
+    #rankingList {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 25px;
+    }
+
+    /* =========================
+       PRODUCT POPUP
+    ========================= */
+
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .popup-overlay.active {
+      display: flex;
+    }
+
+    .popup-content {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      animation: popupAnimation 0.25s ease;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 30px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .popup-close:hover {
+      color: #c0392b;
+    }
+
+    .popup-body {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .popup-image {
+      width: 45%;
+      height: 280px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .popup-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .popup-info {
+      flex: 1;
+    }
+
+    .popup-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #c0392b;
+      margin-bottom: 12px;
+    }
+
+    .popup-info h2 {
+      font-size: 24px;
+      line-height: 1.4;
+      color: #222;
+      margin-bottom: 15px;
+    }
+
+    .popup-rating {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .popup-rating .stars {
+      color: #f5a623;
+      letter-spacing: 1px;
+    }
+
+    #popupRating {
+      font-weight: 700;
+      color: #333;
+    }
+
+    #popupReviews {
+      color: #888;
+    }
+
+    .popup-price {
+      font-size: 30px;
+      font-weight: 700;
+      color: #c0392b;
+      margin-bottom: 15px;
+    }
+
+    .popup-description {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .popup-id {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* Animation */
+    @keyframes popupAnimation {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 550px) {
+      .popup-content {
+        padding: 25px 20px;
+      }
+
+      .popup-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+      }
+
+      .popup-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      .popup-info h2 {
+        font-size: 21px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>Beer Rankings</h1>
+
+      <p id="status">
+        Click the button to load data.
+      </p>
+
+      <button id="loadButton">
+        Load Rankings
+      </button>
+    </div>
+
+    <div id="rankingList"></div>
+
+  </div>
+
+  <!-- Product Detail Popup -->
+  <div class="popup-overlay" id="productPopup">
+    <div class="popup-content">
+
+      <button class="popup-close" id="closePopup">
+        &times;
+      </button>
+
+      <div class="popup-body">
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://api.sampleapis.com/beers/ale"
+    var beerList = []
+
+    async function loadBeers() {
+        const status = document.getElementById("status");
+        const rankingList = document.getElementById("rankingList");
+
+        status.textContent = "Loading data...";
+        rankingList.innerHTML = "";
+
+        try {
+            const response = await fetch(API_URL);
+
+            if (!response.ok) {
+                throw new Error("Could not load data");
+            }
+
+            beerList = await response.json();
+            status.textContent = "Showing the first 10 players.";
+            renderItems();
+
+        } catch (error) {
+            status.textContent = "Unable to load rankings.";
+            console.error(error);
+        }
+    }
+
+    function renderItems() {
+        const rankingList = document.getElementById("rankingList");
+
+        // dùng dynamic rendering để tạo các element theo mẫu có sẵn
+        const cards = beerList.slice(0, 10).map(function(beer) {
+            return `
+                <div class="product-card" onclick="clickCard(${beer.id})">
+                    <div class="product-image">
+                    <img
+                        src=${beer.image}
+                        alt="${beer.name}"
+                    />
+                    </div>
+
+                    <div class="product-info">
+                    <h3 class="product-name">
+                        ${beer.name}
+                    </h3>
+
+                    <div class="product-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-value">${beer.rating.average.toFixed(2)}</span>
+                        <span class="review-count">(${beer.rating.reviews} reviews)</span>
+                    </div>
+
+                    <div class="product-price">${beer.price}</div>
+
+                    <div class="product-footer">
+                        <span class="product-id">Product #${beer.id}</span>
+                        <button class="view-button">View details</button>
+                    </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // thêm tất cả phần cards được tạo mới vào phần rankingList
+        rankingList.innerHTML = cards.join("");
+
+    }
+
+    document.getElementById("loadButton").addEventListener("click", async function () {
+        loadBeers()
+    });
+
+    function clickCard(id) {
+        // Tìm sản phẩm theo ID
+        const beer = beerList.find(function(item) {
+            return item.id === id;
+        });
+
+        if (!beer) return;
+
+        const popupContent = `
+            <div class="popup-image">
+                <img
+                    src="${beer.image}"
+                    alt="${beer.name}"
+                />
+            </div>
+
+            <div class="popup-info">
+
+                <span class="popup-label">
+                    PRODUCT DETAILS
+                </span>
+
+                <h2>${beer.name}</h2>
+
+                <div class="popup-rating">
+                    <span class="stars">★★★★★</span>
+
+                    <span id="popupRating">
+                        ${beer.rating.average.toFixed(2)}
+                    </span>
+
+                    <span id="popupReviews">
+                        (${beer.rating.reviews} reviews)
+                    </span>
+                </div>
+
+                <div class="popup-price">
+                    ${beer.price}
+                </div>
+
+                <p class="popup-description">
+                    Discover this beer and enjoy
+                    its unique flavor.
+                </p>
+
+                <div class="popup-id">
+                    Product #${beer.id}
+                </div>
+
+            </div>
+        `;
+
+        // Chỉ cập nhật popup-body
+        document.querySelector(".popup-body").innerHTML = popupContent;
+
+        // Hiển thị popup
+        document.getElementById("productPopup")
+            .classList.add("active");
+    }
+
+    // Đóng popup bằng nút X
+    document.getElementById("closePopup")
+        .addEventListener("click", function() {
+
+            document.getElementById("productPopup")
+                .classList.remove("active");
+
+        });
+
+    // Đóng popup khi click ra ngoài
+    document.getElementById("productPopup")
+        .addEventListener("click", function(event) {
+
+            if (event.target === this) {
+                this.classList.remove("active");
+            }
+
+        });
+
+    // Đóng popup bằng phím Escape
+    document.addEventListener("keydown", function(event) {
+
+        if (event.key === "Escape") {
+            document.getElementById("productPopup")
+                .classList.remove("active");
+        }
+
+    });
+
+  </script>
+
+</body>
+</html>
